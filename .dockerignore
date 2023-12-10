@@ -1,0 +1,33 @@
+.git
+.github
+.gitignore
+.gitattributes
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+config/master.key
+
+# Dependencies rebuilt inside the image
+node_modules
+vendor/bundle
+.bundle
+
+# Build output and runtime state
+app/assets/builds/*
+!app/assets/builds/.keep
+public/assets
+public/packs
+tmp
+log
+storage
+
+# Development-only material
+spec
+docs
+README.md
+.rubocop.yml
+.rspec
+Procfile.dev
+*.md

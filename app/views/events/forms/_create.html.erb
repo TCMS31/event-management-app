@@ -1,0 +1,44 @@
+<div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createEventModalLabel">New event</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <%= form_with(model: Event.new, url: api_events_path, method: :post,
+                    data: { turbo: false }, id: 'create-event-form') do |form| %>
+        <div class="modal-body">
+          <div class="alert alert-danger d-none" id="create-event-errors" role="alert"></div>
+
+          <div class="mb-3">
+            <%= form.label :name, class: 'form-label' %>
+            <%= form.text_field :name, class: 'form-control', required: true,
+                                maxlength: Event::NAME_MAX_LENGTH %>
+            <div class="form-text">Up to <%= Event::NAME_MAX_LENGTH %> characters, and unique.</div>
+          </div>
+
+          <div class="mb-3">
+            <%= form.label :description, class: 'form-label' %>
+            <%= form.text_area :description, class: 'form-control', rows: 3 %>
+          </div>
+
+          <div class="mb-3">
+            <%= form.label :location, class: 'form-label' %>
+            <%= form.text_field :location, class: 'form-control', required: true %>
+          </div>
+
+          <div class="mb-0">
+            <%= form.label :date, 'Starts at', class: 'form-label' %>
+            <%= form.datetime_local_field :date, class: 'form-control', required: true %>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <%= form.submit 'Create event', class: 'btn btn-success' %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,27 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm">
+  <div class="container-fluid px-4">
+    <%= link_to 'Event Management', root_path, class: 'navbar-brand fw-semibold' %>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-2">
+        <% if user_signed_in? %>
+          <li class="nav-item text-white-50 small d-none d-lg-block">
+            Signed in as <span class="text-white"><%= current_user.email %></span>
+          </li>
+          <li class="nav-item">
+            <%= button_to 'Log out', destroy_user_session_path, method: :delete,
+                          class: 'btn btn-sm btn-outline-light', form_class: 'd-inline' %>
+          </li>
+        <% else %>
+          <li class="nav-item"><%= link_to 'Log in', new_user_session_path, class: 'btn btn-sm btn-outline-light' %></li>
+          <li class="nav-item"><%= link_to 'Sign up', new_user_registration_path, class: 'btn btn-sm btn-light' %></li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+</nav>

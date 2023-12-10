@@ -1,0 +1,80 @@
+require:
+  - rubocop-rails
+  - rubocop-rspec
+
+AllCops:
+  TargetRubyVersion: 3.1
+  NewCops: enable
+  SuggestExtensions: false
+  Exclude:
+    - 'bin/**/*'
+    - 'db/schema.rb'
+    - 'node_modules/**/*'
+    - 'vendor/**/*'
+    - 'tmp/**/*'
+    - 'config/initializers/devise.rb'      # generated, comment-heavy
+    - 'config/initializers/content_security_policy.rb'
+    - 'config/initializers/permissions_policy.rb'
+    - 'config/initializers/inflections.rb'
+    - 'config/initializers/filter_parameter_logging.rb'
+    - 'config/initializers/assets.rb'
+
+# The project favours short, readable methods over hard line-length limits.
+Layout/LineLength:
+  Max: 120
+  Exclude:
+    - 'db/seeds.rb'   # the seed descriptions read better on one line
+
+# db/seeds.rb prints a summary on purpose; it is a script, not request code.
+Rails/Output:
+  Exclude:
+    - 'db/seeds.rb'
+
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
+    - 'config/**/*'
+    - 'db/seeds.rb'
+
+Metrics/MethodLength:
+  Max: 15
+
+Style/Documentation:
+  Enabled: false
+
+# Endless method definitions are used deliberately for one-line predicates.
+Style/EndlessMethod:
+  EnforcedStyle: allow_single_line
+
+RSpec/ExampleLength:
+  Max: 12
+
+RSpec/MultipleExpectations:
+  Max: 4
+
+RSpec/NestedGroups:
+  Max: 4
+
+# The specs deliberately write a column straight to the database to reproduce
+# rows that predate a validation.
+Rails/SkipsModelValidations:
+  Exclude:
+    - 'spec/**/*'
+
+FactoryBot/ExcessiveCreateList:
+  MaxAmount: 20
+
+# Explicit `type:` metadata is kept so the specs read the same whether or not
+# they live in the conventional directory.
+RSpecRails/InferredSpecType:
+  Enabled: false
+
+# The factories deliberately name the factory a differently-named association
+# points at (organizer -> :user).
+FactoryBot/AssociationStyle:
+  Enabled: false
+
+# Seeds read better as top-level constants than as a nested namespace.
+Style/MutableConstant:
+  Exclude:
+    - 'db/seeds.rb'
