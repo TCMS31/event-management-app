@@ -1,0 +1,10 @@
+<%# Devise reports failed sign-ins and sign-outs through the flash. %>
+<% flash.each do |type, message| %>
+  <% next unless message.is_a?(String) %>
+  <div class="container pt-3">
+    <div class="alert <%= type.to_s == 'notice' ? 'alert-success' : 'alert-danger' %> mb-0"
+         role="<%= type.to_s == 'notice' ? 'status' : 'alert' %>">
+      <%= message %>
+    </div>
+  </div>
+<% end %>

@@ -12,6 +12,9 @@
   <body class="bg-body-tertiary">
     <%= render 'layouts/navbar' %>
     <%= render 'layouts/alert' %>
-    <main class="pb-5"><%= yield %></main>
+    <main class="pb-5">
+      <%= render 'layouts/flash' %>
+      <%= yield %>
+    </main>
   </body>
 </html>

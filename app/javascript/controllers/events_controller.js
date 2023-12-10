@@ -182,6 +182,15 @@ export default class extends Controller {
     return Number.isNaN(parsed.valueOf()) ? "—" : DATE_FORMAT.format(parsed)
   }
 
+  // <input type="datetime-local"> yields wall-clock time with no zone, which
+  // the server would read as UTC. Convert it in the browser, where the zone is
+  // known, so 18:30 typed in Lahore is stored as 13:30Z and shown back as 18:30.
+  toIsoWithOffset(localValue) {
+    if (!localValue) return localValue
+    const parsed = new Date(localValue)
+    return Number.isNaN(parsed.valueOf()) ? localValue : parsed.toISOString()
+  }
+
   // --- actions ------------------------------------------------------------
 
   create(clickEvent) {
@@ -202,7 +211,7 @@ export default class extends Controller {
         name: payload["event[name]"],
         description: payload["event[description]"],
         location: payload["event[location]"],
-        date: payload["event[date]"]
+        date: this.toIsoWithOffset(payload["event[date]"])
       }
     })
 

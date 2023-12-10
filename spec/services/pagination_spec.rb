@@ -31,6 +31,33 @@ RSpec.describe Pagination do
       expect(described_class.page(params: { page: '-2' })).to eq(1)
       expect(described_class.page(params: { page: 'banana' })).to eq(1)
     end
+
+    it 'caps an absurd page number so the offset fits in a bigint' do
+      expect(described_class.page(params: { page: '9' * 30 })).to eq(described_class::MAX_PAGE)
+    end
+  end
+
+  describe '.max_per_page' do
+    around do |example|
+      original = ENV.fetch('EVENTS_MAX_PAGE_SIZE', nil)
+      example.run
+    ensure
+      ENV['EVENTS_MAX_PAGE_SIZE'] = original
+    end
+
+    it 'reads EVENTS_MAX_PAGE_SIZE' do
+      ENV['EVENTS_MAX_PAGE_SIZE'] = '25'
+
+      expect(described_class.max_per_page).to eq(25)
+    end
+
+    it 'never drops below one row when the setting is zero or garbage' do
+      %w[0 -4 abc].each do |value|
+        ENV['EVENTS_MAX_PAGE_SIZE'] = value
+
+        expect(described_class.per_page(params: { per_page: '10' })).to eq(1)
+      end
+    end
   end
 
   describe '.apply and .meta' do

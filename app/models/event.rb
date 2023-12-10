@@ -37,7 +37,7 @@ class Event < ApplicationRecord
     user.present? && organizer_id == user.id
   end
 
-  # Reads the window-function count when the record came from `with_attendee_counts`,
+  # Reads the grouped count when the record came from `with_attendee_counts`,
   # and falls back to a direct count otherwise.
   def attendees_count
     self[:attendees_count] || event_attendances.count

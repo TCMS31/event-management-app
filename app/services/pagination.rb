@@ -9,15 +9,20 @@
 module Pagination
   DEFAULT_PER_PAGE = 10
   MIN_PER_PAGE = 1
+  # Far beyond any real catalogue, and small enough that the OFFSET it implies
+  # stays inside PostgreSQL's bigint instead of raising a 500.
+  MAX_PAGE = 100_000
 
   module_function
 
+  # A misconfigured EVENTS_MAX_PAGE_SIZE (0, blank, "abc") would make
+  # Integer#clamp raise on every list request, so it is floored at one row.
   def max_per_page
-    ENV.fetch('EVENTS_MAX_PAGE_SIZE', 100).to_i
+    [ENV.fetch('EVENTS_MAX_PAGE_SIZE', 100).to_i, MIN_PER_PAGE].max
   end
 
   def page(params:)
-    [params[:page].to_i, 1].max
+    params[:page].to_i.clamp(1, MAX_PAGE)
   end
 
   def per_page(params:)

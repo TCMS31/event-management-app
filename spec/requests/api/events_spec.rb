@@ -62,6 +62,13 @@ RSpec.describe 'Api::Events', type: :request do
         expect(json_meta['page']).to eq(3)
       end
 
+      it 'answers an absurd page number with an empty page, not a 500' do
+        get '/api/events', params: { page: '9' * 30 }
+
+        expect(response).to have_http_status(:ok)
+        expect(json_events).to be_empty
+      end
+
       it 'caps an oversized per_page instead of returning everything' do
         get '/api/events', params: { per_page: 10_000 }
 
@@ -149,6 +156,14 @@ RSpec.describe 'Api::Events', type: :request do
 
       expect(response).to have_http_status(:created)
       expect(Event.last.name).to eq(attributes[:name])
+    end
+
+    it 'keeps the instant when the start time carries a UTC offset' do
+      # The page sends the browser's local time converted with toISOString();
+      # an explicit offset must survive rather than be read as UTC wall time.
+      post '/api/events', params: { event: attributes_for(:event).merge(date: '2026-12-01T18:30:00+05:00') }
+
+      expect(Event.last.date).to eq(Time.utc(2026, 12, 1, 13, 30))
     end
 
     it 'takes the organizer from the session, not the request body' do
