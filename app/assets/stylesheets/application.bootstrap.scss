@@ -1,1 +1,176 @@
+// Palette: a printed noticeboard rather than a dashboard. Ink-green text on
+// warm paper, brick red for the one action you came to take, forest green for
+// "you are going". All text/background pairs below clear WCAG AA.
+$ink: #1d2a2a;
+$paper: #f6f2ea;
+$brick: #a63d24;
+$forest: #2f6b4f;
+$slate: #59625f;
+
+$primary: $brick;
+$success: $forest;
+$secondary: $slate;
+$dark: $ink;
+$body-bg: $paper;
+$body-color: $ink;
+$link-color: $brick;
+
+$font-family-sans-serif: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+$headings-font-family: "Fraunces", Georgia, "Times New Roman", serif;
+$headings-font-weight: 600;
+$border-radius: .5rem;
+$border-radius-sm: .375rem;
+$focus-ring-color: rgba($brick, .4);
+// Forms and dialogs sit on white cards, not on the paper background.
+$input-bg: #fff;
+$modal-content-bg: #fff;
+
 @import 'bootstrap/scss/bootstrap';
+
+// ---- chrome -----------------------------------------------------------------
+
+.app-header {
+  background: $ink;
+  border-bottom: 4px solid $brick;
+
+  .navbar-brand {
+    font-family: $headings-font-family;
+    font-size: 1.35rem;
+    letter-spacing: .01em;
+  }
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -3rem;
+  z-index: 1100;
+  padding: .5rem .75rem;
+  background: $paper;
+  color: $ink;
+  border-radius: $border-radius-sm;
+
+  &:focus { top: .75rem; }
+}
+
+.page-kicker {
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: $brick;
+}
+
+.board {
+  background: #fff;
+  border: 1px solid rgba($ink, .12);
+  border-radius: $border-radius-lg;
+  box-shadow: 0 1px 0 rgba($ink, .06);
+  overflow: hidden;
+}
+
+.board .table {
+  --bs-table-bg: transparent;
+  --bs-table-hover-bg: #{rgba($paper, .7)};
+
+  thead th {
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: $slate;
+    background: rgba($paper, .6);
+    border-bottom-color: rgba($ink, .15);
+  }
+
+  td { padding-top: .85rem; padding-bottom: .85rem; }
+}
+
+// The start time rendered as a ticket stub: day number over month and time.
+.date-stub {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 4.25rem;
+  padding: .3rem .5rem;
+  border: 1px dashed rgba($ink, .35);
+  border-radius: $border-radius-sm;
+  line-height: 1.1;
+
+  .date-stub-day {
+    font-family: $headings-font-family;
+    font-size: 1.4rem;
+    font-weight: 600;
+  }
+
+  .date-stub-month {
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: $brick;
+  }
+
+  .date-stub-time { font-size: .78rem; color: $slate; }
+}
+
+.attendee-count {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.auth-card {
+  max-width: 26rem;
+  margin: 3rem auto;
+  padding: 2rem;
+  background: #fff;
+  border: 1px solid rgba($ink, .12);
+  border-top: 4px solid $brick;
+  border-radius: $border-radius-lg;
+}
+
+// ---- small screens: each row becomes a card ----------------------------------
+
+@include media-breakpoint-down(md) {
+  .board .table {
+    thead { display: none; }
+
+    tbody tr {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: .25rem .75rem;
+      padding: 1rem;
+      border-bottom: 1px solid rgba($ink, .12);
+    }
+
+    tbody td {
+      display: block;
+      padding: 0;
+      border: 0;
+      white-space: normal;
+      text-align: left !important;
+    }
+
+    td.cell-date { grid-row: span 3; }
+    td.cell-name { grid-column: 2; min-width: 0; }
+
+    td[data-label]:not(.cell-date):not(.cell-name):not(.cell-actions) {
+      grid-column: 2;
+      font-size: .9rem;
+
+      &::before {
+        content: attr(data-label) ": ";
+        color: $slate;
+      }
+    }
+
+    td.cell-actions {
+      grid-column: 1 / -1;
+      padding-top: .5rem;
+
+      .btn { margin-left: 0 !important; margin-right: .25rem; }
+    }
+
+    .event-description { max-width: none !important; }
+  }
+}

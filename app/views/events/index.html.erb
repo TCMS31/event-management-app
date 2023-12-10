@@ -1,29 +1,24 @@
+<% content_for :title, 'Events' %>
 <div class="container py-4" data-controller="events" data-action-name="index">
-  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+  <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
     <div>
-      <h1 class="h3 mb-1">Events</h1>
-      <p class="text-secondary mb-0" data-events-target="summary">Loading events&hellip;</p>
+      <p class="page-kicker mb-1">What's on</p>
+      <h1 class="h2 mb-1">Events</h1>
+      <p class="text-secondary mb-0" data-events-target="summary" aria-live="polite">Loading events&hellip;</p>
     </div>
-    <button class="btn btn-success" data-action="click->events#create">
+    <button type="button" class="btn btn-primary" data-action="click->events#create">
       New event
     </button>
   </div>
 
-  <div class="card shadow-sm border-0">
+  <div class="board">
     <div class="table-responsive">
       <table class="table table-hover align-middle mb-0">
-        <colgroup>
-          <col style="width: 34%">
-          <col style="width: 12%">
-          <col style="width: 16%">
-          <col style="width: 20%">
-          <col style="width: 8%">
-          <col style="width: 10%">
-        </colgroup>
-        <thead class="table-light">
+        <caption class="visually-hidden">Upcoming and past events, earliest first</caption>
+        <thead>
           <tr>
+            <th scope="col" style="width: 7rem">Starts</th>
             <th scope="col">Event</th>
-            <th scope="col">Starts</th>
             <th scope="col">Location</th>
             <th scope="col">Organizer</th>
             <th scope="col" class="text-center">Attendees</th>
@@ -35,21 +30,21 @@
     </div>
 
     <div class="p-5 text-center text-secondary d-none" data-events-target="emptyState">
-      <p class="mb-1 fw-semibold">No events yet</p>
-      <p class="mb-0 small">Create the first one and it will show up here.</p>
+      <p class="h5 mb-1">Nothing on the board yet</p>
+      <p class="mb-0">Create the first event and it will show up here.</p>
     </div>
 
-    <div class="p-5 text-center text-danger d-none" data-events-target="errorState">
+    <div class="p-5 text-center text-danger d-none" data-events-target="errorState" role="alert">
       <p class="mb-0 fw-semibold">Could not load events. Please refresh the page.</p>
     </div>
   </div>
 
   <nav class="d-flex justify-content-between align-items-center mt-3 d-none" aria-label="Events pages"
        data-events-target="pager">
-    <button class="btn btn-outline-secondary btn-sm" data-action="click->events#previousPage"
+    <button type="button" class="btn btn-outline-secondary btn-sm" data-action="click->events#previousPage"
             data-events-target="previousButton">&larr; Previous</button>
     <span class="small text-secondary" data-events-target="pageLabel"></span>
-    <button class="btn btn-outline-secondary btn-sm" data-action="click->events#nextPage"
+    <button type="button" class="btn btn-outline-secondary btn-sm" data-action="click->events#nextPage"
             data-events-target="nextButton">Next &rarr;</button>
   </nav>
 </div>

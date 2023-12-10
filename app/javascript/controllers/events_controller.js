@@ -5,6 +5,9 @@ const DATE_FORMAT = new Intl.DateTimeFormat(undefined, {
   dateStyle: "medium",
   timeStyle: "short"
 })
+const DAY_FORMAT = new Intl.DateTimeFormat(undefined, { day: "numeric" })
+const MONTH_FORMAT = new Intl.DateTimeFormat(undefined, { month: "short" })
+const TIME_FORMAT = new Intl.DateTimeFormat(undefined, { timeStyle: "short" })
 
 // Drives the single events page: loads a page of events from /api/events and
 // wires up the create / show / join / delete actions.
@@ -57,6 +60,7 @@ export default class extends Controller {
   }
 
   async index() {
+    this.tableBodyTarget.closest("table").setAttribute("aria-busy", "true")
     try {
       const response = await fetch(`/api/events?page=${this.page}`, { headers: this.headers })
       if (!response.ok) throw new Error(`Request failed with ${response.status}`)
@@ -69,6 +73,8 @@ export default class extends Controller {
       this.tableBodyTarget.replaceChildren()
       this.errorStateTarget.classList.remove("d-none")
       this.summaryTarget.textContent = ""
+    } finally {
+      this.tableBodyTarget.closest("table").removeAttribute("aria-busy")
     }
   }
 
@@ -95,10 +101,10 @@ export default class extends Controller {
     row.id = `row-${event.id}`
 
     row.append(
+      this.dateCell(event.date),
       this.nameCell(event),
-      this.textCell(this.formatDate(event.date)),
-      this.textCell(event.location ?? ""),
-      this.textCell(event.organizer?.email ?? ""),
+      this.textCell("Location", event.location ?? ""),
+      this.textCell("Organizer", event.organizer?.email ?? ""),
       this.countCell(event.attendees_count ?? 0),
       this.actionsCell(event)
     )
@@ -106,8 +112,48 @@ export default class extends Controller {
     return row
   }
 
+  // Day and month stacked like a ticket stub. The stub is hidden from screen
+  // readers, which get the full date and time from a visually hidden copy.
+  dateCell(value) {
+    const cell = document.createElement("td")
+    cell.className = "cell-date"
+    cell.dataset.label = "Starts"
+
+    const parsed = value ? new Date(value) : null
+    if (!parsed || Number.isNaN(parsed.valueOf())) {
+      cell.textContent = "—"
+      return cell
+    }
+
+    const stub = document.createElement("time")
+    stub.className = "date-stub"
+    stub.dateTime = value
+
+    const spoken = document.createElement("span")
+    spoken.className = "visually-hidden"
+    spoken.textContent = DATE_FORMAT.format(parsed)
+    stub.append(spoken)
+
+    const parts = [
+      ["date-stub-month", MONTH_FORMAT.format(parsed)],
+      ["date-stub-day", DAY_FORMAT.format(parsed)],
+      ["date-stub-time", TIME_FORMAT.format(parsed)]
+    ]
+    parts.forEach(([className, text]) => {
+      const part = document.createElement("span")
+      part.className = className
+      part.setAttribute("aria-hidden", "true")
+      part.textContent = text
+      stub.append(part)
+    })
+
+    cell.append(stub)
+    return cell
+  }
+
   nameCell(event) {
     const cell = document.createElement("td")
+    cell.className = "cell-name"
 
     const name = document.createElement("div")
     name.className = "fw-semibold"
@@ -116,7 +162,7 @@ export default class extends Controller {
 
     if (event.description) {
       const description = document.createElement("div")
-      description.className = "small text-secondary text-truncate"
+      description.className = "event-description small text-secondary text-truncate"
       description.style.maxWidth = "24rem"
       description.textContent = event.description
       cell.append(description)
@@ -125,40 +171,36 @@ export default class extends Controller {
     return cell
   }
 
-  textCell(value) {
+  textCell(label, value) {
     const cell = document.createElement("td")
-    cell.className = "text-nowrap"
+    cell.dataset.label = label
     cell.textContent = value
     return cell
   }
 
   countCell(value) {
     const cell = document.createElement("td")
-    cell.className = "text-center"
-
-    const badge = document.createElement("span")
-    badge.className = "badge rounded-pill text-bg-secondary"
-    badge.textContent = String(value)
-    cell.append(badge)
-
+    cell.className = "text-center attendee-count"
+    cell.dataset.label = "Attendees"
+    cell.textContent = String(value)
     return cell
   }
 
   actionsCell(event) {
     const cell = document.createElement("td")
-    cell.className = "text-end text-nowrap"
+    cell.className = "cell-actions text-end text-nowrap"
 
-    cell.append(this.button("Details", "btn-outline-secondary", "events#show", event.id))
+    cell.append(this.button("Details", "btn-outline-secondary", "events#show", event))
 
     if (event.editable) {
-      cell.append(this.button("Delete", "btn-outline-danger", "events#delete", event.id))
+      cell.append(this.button("Delete", "btn-outline-danger", "events#delete", event))
     } else if (event.joined) {
       const joined = document.createElement("span")
       joined.className = "badge text-bg-success align-middle ms-1"
       joined.textContent = "Joined"
       cell.append(joined)
     } else {
-      const join = this.button("Join", "btn-success", "events#join", event.id)
+      const join = this.button("Join", "btn-primary", "events#join", event)
       join.id = `join-event-${event.id}`
       cell.append(join)
     }
@@ -166,12 +208,15 @@ export default class extends Controller {
     return cell
   }
 
-  button(label, variant, action, eventId) {
+  // Every row has the same three button labels, so each one also carries the
+  // event name for screen readers ("Join Hotwire in Practice").
+  button(label, variant, action, event) {
     const button = document.createElement("button")
     button.type = "button"
     button.className = `btn btn-sm ${variant} ms-1`
     button.dataset.action = `click->${action}`
-    button.dataset.eventId = eventId
+    button.dataset.eventId = event.id
+    button.setAttribute("aria-label", `${label} ${event.name}`)
     button.textContent = label
     return button
   }

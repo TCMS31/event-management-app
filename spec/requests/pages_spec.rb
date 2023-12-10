@@ -21,6 +21,26 @@ RSpec.describe 'HTML pages', type: :request do
     end
   end
 
+  describe 'GET /users/edit' do
+    it 'renders the account page with a way to delete the account' do
+      sign_in user
+      get edit_user_registration_path
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include('Your account', 'Delete my account')
+    end
+  end
+
+  describe 'signing up' do
+    it 'lists every validation problem' do
+      post user_registration_path, params: { user: { email: 'not-an-email', password: '123',
+                                                     password_confirmation: '456' } }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to include('Email is invalid', 'Password is too short')
+    end
+  end
+
   describe 'logging in' do
     it 'says why a failed login was refused' do
       post user_session_path, params: { user: { email: user.email, password: 'wrong' } }

@@ -1,5 +1,6 @@
-<div class="position-fixed top-0 end-0 p-3" style="z-index: 1080">
-  <div id="customAlert" class="alert alert-success shadow fade mb-0 d-none" role="alert" aria-live="polite">
+<%# Toast for the events page. The live region stays in the DOM so screen readers announce each message. %>
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 1080" aria-live="polite" aria-atomic="true">
+  <div id="customAlert" class="alert alert-success shadow fade mb-0 d-none" role="status">
     <span id="alertText"></span>
   </div>
 </div>
