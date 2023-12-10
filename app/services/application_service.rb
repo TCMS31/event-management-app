@@ -17,7 +17,7 @@ class ApplicationService
     Result.new(success: true, payload: payload, status: status)
   end
 
-  def failure(error, status: :unprocessable_entity)
+  def failure(error, status: :unprocessable_content)
     Result.new(success: false, error: error, status: status)
   end
 end

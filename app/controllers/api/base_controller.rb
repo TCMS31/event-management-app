@@ -27,7 +27,7 @@ module Api
 
     # Loads the event named by :id or halts with 404.
     def set_event
-      @event = Event.find(params[:id])
+      @event = Event.find(params.expect(:id))
     end
 
     # Halts with 403 unless the policy allows `action`.

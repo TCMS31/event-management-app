@@ -8,7 +8,7 @@ module RenderJsonResponse
     render json: object, status: status
   end
 
-  def error_render(errors, status: :unprocessable_entity)
+  def error_render(errors, status: :unprocessable_content)
     messages = errors.respond_to?(:messages) ? errors.messages : errors
     render json: messages, status: status
   end

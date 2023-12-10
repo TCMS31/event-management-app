@@ -11,7 +11,10 @@ Bundler.require(*Rails.groups)
 module EventManagementApp
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 7.0
+    config.load_defaults 8.1
+
+    # Autoload lib/, except folders that hold no Ruby classes.
+    config.autoload_lib(ignore: %w[assets tasks])
 
     # Configuration for the application, engines, and railties goes here.
     #

@@ -131,14 +131,14 @@ RSpec.describe 'Api::Events', type: :request do
     it 'returns 422 and the messages when the data is invalid' do
       post '/api/events', params: { event: { name: nil } }
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(json_body['name']).to include("can't be blank")
     end
 
     it 'rejects an event with no start time' do
       post '/api/events', params: { event: attributes_for(:event).merge(date: nil) }
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(json_body['date']).to include("can't be blank")
     end
 
@@ -164,7 +164,7 @@ RSpec.describe 'Api::Events', type: :request do
     it 'returns 422 when the data is invalid' do
       put "/api/events/#{event.id}", params: { event: { name: nil } }
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(json_body['name']).to include("can't be blank")
     end
 

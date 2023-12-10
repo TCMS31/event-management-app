@@ -41,7 +41,7 @@ module Api
     # `organizer` is deliberately not permitted: ownership comes from the
     # session, never from the request body.
     def event_params
-      params.require(:event).permit(:name, :description, :date, :location)
+      params.expect(event: %i[name description date location])
     end
   end
 end

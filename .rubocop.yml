@@ -1,9 +1,11 @@
-require:
+plugins:
+  - rubocop-factory_bot
   - rubocop-rails
   - rubocop-rspec
+  - rubocop-rspec_rails
 
 AllCops:
-  TargetRubyVersion: 3.1
+  TargetRubyVersion: 3.4
   NewCops: enable
   SuggestExtensions: false
   Exclude:
@@ -73,6 +75,12 @@ RSpecRails/InferredSpecType:
 # points at (organizer -> :user).
 FactoryBot/AssociationStyle:
   Enabled: false
+
+# Serializer methods named after JSON attributes (`editable`, `joined`) keep
+# the attribute names the client reads.
+Naming/PredicateMethod:
+  Exclude:
+    - 'app/serializers/**/*'
 
 # Seeds read better as top-level constants than as a nested namespace.
 Style/MutableConstant:

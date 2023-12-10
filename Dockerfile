@@ -3,7 +3,7 @@
 # ---------- build ----------------------------------------------------------
 # Compiles native gem extensions and the Bootstrap stylesheet, so the runtime
 # image needs neither a compiler nor Node.
-FROM ruby:3.1.3-slim AS build
+FROM ruby:3.4.12-slim AS build
 
 ENV RAILS_ENV=production \
     BUNDLE_DEPLOYMENT=1 \
@@ -38,7 +38,7 @@ RUN yarn build:css \
  && rm -rf node_modules tmp/cache log/*
 
 # ---------- runtime --------------------------------------------------------
-FROM ruby:3.1.3-slim AS runtime
+FROM ruby:3.4.12-slim AS runtime
 
 ENV RAILS_ENV=production \
     BUNDLE_DEPLOYMENT=1 \
