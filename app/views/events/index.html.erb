@@ -1,0 +1,29 @@
+
+<div data-controller='events' data-action-name = 'index'>
+<div class='text-center'>
+  <h1>Events</h1>
+  <button class='btn btn-primary' data-action="click->events#create">Create Event</button>
+</div>
+
+<div class="container">
+  <table class= 'mt-4 table table-striped table-dark align-middle'>
+    <thead class="">
+      <tr class='text-center'>
+        <th>#</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Date</th>
+        <th>Location</th>
+        <th>Organizer Email</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody data-events-target="tableBody"></tbody>
+  </table>
+</div>
+
+  <div data-events-target="modalBody"></div>
+</div>
+
+<%= render 'events/forms/show' %>
+<%= render 'events/forms/create' %>
