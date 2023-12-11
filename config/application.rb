@@ -16,6 +16,10 @@ module EventManagementApp
     # Autoload lib/, except folders that hold no Ruby classes.
     config.autoload_lib(ignore: %w[assets tasks])
 
+    # Nothing here stores uploads, so Active Storage needs no image processor
+    # (and stops warning that image_processing is missing).
+    config.active_storage.variant_processor = :disabled
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files

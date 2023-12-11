@@ -1,41 +1,41 @@
 # syntax=docker/dockerfile:1
 
-# ---------- build ----------------------------------------------------------
-# Compiles native gem extensions and the Bootstrap stylesheet, so the runtime
-# image needs neither a compiler nor Node.
-FROM ruby:3.4.12-slim AS build
+# ---------- stylesheet -----------------------------------------------------
+# Bootstrap is compiled with Node here, so neither Ruby stage needs Node.
+FROM node:22-bookworm-slim AS css
+
+WORKDIR /rails
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile --network-timeout 600000
+
+COPY app/assets/stylesheets app/assets/stylesheets
+RUN mkdir -p app/assets/builds && yarn build:css
+
+# ---------- gems and assets ------------------------------------------------
+# The full Ruby image already carries a compiler, libpq-dev and libyaml-dev for
+# the native gems (pg, psych, bcrypt, puma), so this stage installs no packages.
+FROM ruby:3.4.12 AS build
 
 ENV RAILS_ENV=production \
     BUNDLE_DEPLOYMENT=1 \
     BUNDLE_PATH=/usr/local/bundle \
     BUNDLE_WITHOUT=development:test
 
-RUN apt-get update -qq \
- && apt-get install --no-install-recommends -y \
-      build-essential git libpq-dev pkg-config curl ca-certificates \
- && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
- && apt-get install --no-install-recommends -y nodejs \
- && npm install -g yarn@1.22.22 \
- && rm -rf /var/lib/apt/lists/*
-
 WORKDIR /rails
 
 # Gems first: this layer is cached until Gemfile.lock changes.
-COPY Gemfile Gemfile.lock ./
+COPY Gemfile Gemfile.lock .ruby-version ./
 RUN bundle install \
  && rm -rf "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git
 
-# Then node modules, for the same reason.
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
-
 COPY . .
+COPY --from=css /rails/app/assets/builds/application.css app/assets/builds/application.css
 
-# Build the CSS bundle and precompile assets. SECRET_KEY_BASE_DUMMY lets the
-# app initialise without the real production secret.
-RUN yarn build:css \
- && SECRET_KEY_BASE=dummy bundle exec rails assets:precompile \
- && rm -rf node_modules tmp/cache log/*
+# A throwaway SECRET_KEY_BASE lets the app boot far enough to precompile.
+# SKIP_CSS_BUILD stops cssbundling from re-running `yarn build:css` here, where
+# there is no Node; the stylesheet already came from the css stage.
+RUN SECRET_KEY_BASE_DUMMY=1 SKIP_CSS_BUILD=1 bundle exec rails assets:precompile \
+ && rm -rf tmp/cache log/*
 
 # ---------- runtime --------------------------------------------------------
 FROM ruby:3.4.12-slim AS runtime
@@ -49,7 +49,7 @@ ENV RAILS_ENV=production \
     PORT=3000
 
 RUN apt-get update -qq \
- && apt-get install --no-install-recommends -y libpq5 curl tzdata \
+ && apt-get install --no-install-recommends -y libpq5 libyaml-0-2 curl tzdata \
  && rm -rf /var/lib/apt/lists/*
 
 # Run as an unprivileged user.
