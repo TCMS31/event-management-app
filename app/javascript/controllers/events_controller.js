@@ -140,7 +140,6 @@ export default class extends Controller {
 
       <td class="my-2 text-center">
       <button class='btn btn-light' data-action="click->events#show" data-event-id="${event.id}">Show</button>
-      <button class='btn btn-light' data-action="click->events#edit" data-event-id="${event.id}">Edit</button>
       <button class='btn btn-light' data-action="click->events#delete" data-event-id="${event.id}">Delete</button>
       <button class='btn btn-light' data-event-id="${event.id}" id="join-event-${event.id}" data-action="click->events#join">Join</button>
       </td>
